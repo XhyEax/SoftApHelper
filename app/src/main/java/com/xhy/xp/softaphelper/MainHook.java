@@ -61,7 +61,7 @@ public class MainHook implements IXposedHookLoadPackage {
                         @Override
                         protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
                             super.beforeHookedMethod(param);
-                            XposedBridge.log(StackUtils.getStackTraceString());
+//                            XposedBridge.log(StackUtils.getStackTraceString());
                             if (StackUtils.isCallingFrom(className, callerMethodName_Q)) {
                                 param.setResult(mLinkAddress);
                             }
