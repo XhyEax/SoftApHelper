@@ -42,7 +42,7 @@ public class MainHook implements IXposedHookLoadPackage {
             if (!packageName.equals("android"))
                 return;
 
-            findAndHookMethod(className, lpparam.classLoader, methodName,
+            findAndHookMethod(className, classLoader, methodName,
                     new XC_MethodReplacement() {
                         @Override
                         protected Object replaceHookedMethod(MethodHookParam param) {
@@ -55,18 +55,36 @@ public class MainHook implements IXposedHookLoadPackage {
 
             Constructor<?> ctor = LinkAddress.class.getDeclaredConstructor(String.class);
             final Object mLinkAddress = ctor.newInstance(WIFI_HOST_IFACE_ADDRESS);
-
-            findAndHookMethod(className, classLoader, methodName,
-                    new XC_MethodHook() {
-                        @Override
-                        protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
-                            super.beforeHookedMethod(param);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            {
+                findAndHookMethod(className, classLoader, methodName, boolean.class,
+                        new XC_MethodHook() {
+                            @Override
+                            protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+                                super.beforeHookedMethod(param);
+//                            XposedBridge.log(param.method.getName());
 //                            XposedBridge.log(StackUtils.getStackTraceString());
-                            if (StackUtils.isCallingFrom(className, callerMethodName_Q)) {
-                                param.setResult(mLinkAddress);
+                                if (StackUtils.isCallingFrom(className, callerMethodName_Q)) {
+                                    param.setResult(mLinkAddress);
+                                }
                             }
-                        }
-                    });
+                        });
+            }
+            else
+            {
+                findAndHookMethod(className, classLoader, methodName,
+                        new XC_MethodHook() {
+                            @Override
+                            protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+                                super.beforeHookedMethod(param);
+//                            XposedBridge.log(param.method.getName());
+//                            XposedBridge.log(StackUtils.getStackTraceString());
+                                if (StackUtils.isCallingFrom(className, callerMethodName_Q)) {
+                                    param.setResult(mLinkAddress);
+                                }
+                            }
+                        });
+            }
         }
     }
 
