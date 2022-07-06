@@ -42,14 +42,14 @@ public class MainHook implements IXposedHookLoadPackage {
             if (!packageName.equals("android"))
                 return;
 
-            findAndHookMethod(className, lpparam.classLoader, methodName,
+            findAndHookMethod(className, classLoader, methodName,
                     new XC_MethodReplacement() {
                         @Override
                         protected Object replaceHookedMethod(MethodHookParam param) {
                             return WIFI_HOST_IFACE_ADDR;
                         }
                     });
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
             if (!packageName.equals("com.android.networkstack.tethering.inprocess"))
                 return;
 
@@ -57,6 +57,24 @@ public class MainHook implements IXposedHookLoadPackage {
             final Object mLinkAddress = ctor.newInstance(WIFI_HOST_IFACE_ADDRESS);
 
             findAndHookMethod(className, classLoader, methodName,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+//                            XposedBridge.log(StackUtils.getStackTraceString());
+                            if (StackUtils.isCallingFrom(className, callerMethodName_Q)) {
+                                param.setResult(mLinkAddress);
+                            }
+                        }
+                    });
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!packageName.equals("com.android.networkstack.tethering.inprocess"))
+                return;
+
+            Constructor<?> ctor = LinkAddress.class.getDeclaredConstructor(String.class);
+            final Object mLinkAddress = ctor.newInstance(WIFI_HOST_IFACE_ADDRESS);
+
+            findAndHookMethod(className, classLoader, methodName, boolean.class,
                     new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
