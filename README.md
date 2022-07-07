@@ -1,6 +1,6 @@
 # SoftApHelper
 
-SoftAp static server IP(v4) for Android P-R (Xposed)
+SoftAp static server IP(v4) for Android P-S (Xposed)
 
 ## 原理
 [安卓9 固定Wifi热点IP (Xposed)](https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/)
