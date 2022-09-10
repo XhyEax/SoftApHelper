@@ -17,6 +17,7 @@ SoftAp static server IP(v4) for Android P-S (Xposed)
 ```java
 private String getRandomWifiIPv4Address()
 ```
+lsposed勾选系统框架
 
 ### 安卓10
 `android.net.ip.IpServer`的`getRandomWifiIPv4Address`函数。
@@ -25,6 +26,8 @@ private String getRandomWifiIPv4Address()
 ```java
 private String getRandomWifiIPv4Address()
 ```
+lsposed勾选com.android.networkstack.tethering.inprocess类似的
+
 ### 安卓11
 `android.net.ip.IpServer`的`requestIpv4Address`函数。
 
@@ -34,6 +37,7 @@ private LinkAddress requestIpv4Address()
 ```
 
 注意：由于该函数还被用于分配下游IP地址，所以需要先判断调用者（遍历堆栈即可），再进行替换。
+lsposed勾选com.android.networkstack.tethering.inprocess类似的
 
 ### 安卓12
 `android.net.ip.IpServer`的`requestIpv4Address`函数。
@@ -42,3 +46,4 @@ private LinkAddress requestIpv4Address()
 ```java
 private LinkAddress requestIpv4Address(final boolean useLastAddress)
 ```
+lsposed勾选com.android.networkstack.tethering.inprocess类似的

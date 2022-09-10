@@ -6,6 +6,7 @@ import android.net.LinkAddress;
 import android.os.Build;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -37,10 +38,20 @@ public class MainHook implements IXposedHookLoadPackage {
         final String methodName = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? methodName_R :
                 methodName_P_Q;
 
+        ArrayList<String> list = new ArrayList<>();
+        list.add("com.android.networkstack.tethering.inprocess");
+        list.add("com.android.networkstack.tethering");
+        list.add("com.google.android.networkstack.tethering.inprocess");
+        list.add("com.google.android.networkstack.tethering");
+        list.add("android");
+        if (!list.contains(packageName))
+            return;
+//        XposedBridge.log("[handleLoadPackage] packageName: " + packageName);
+
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P ||
                 Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
-            if (!packageName.equals("android"))
-                return;
+//            if (!packageName.equals("android"))
+//                return;
 
             findAndHookMethod(className, classLoader, methodName,
                     new XC_MethodReplacement() {
@@ -49,9 +60,27 @@ public class MainHook implements IXposedHookLoadPackage {
                             return WIFI_HOST_IFACE_ADDR;
                         }
                     });
+        } else if (Build.MANUFACTURER.equalsIgnoreCase("motorola") &&
+                Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
+//            if (!packageName.equals("com.google.android.networkstack.tethering"))
+//                return;
+            Constructor<?> ctor = LinkAddress.class.getDeclaredConstructor(String.class);
+            final Object mLinkAddress = ctor.newInstance(WIFI_HOST_IFACE_ADDRESS);
+
+            findAndHookMethod(className, classLoader, methodName, boolean.class,
+                    new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+//                            XposedBridge.log(StackUtils.getStackTraceString());
+                            if (StackUtils.isCallingFrom(className, callerMethodName_Q)) {
+                                param.setResult(mLinkAddress);
+                            }
+                        }
+                    });
         } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
-            if (!packageName.equals("com.android.networkstack.tethering.inprocess"))
-                return;
+//            if (!packageName.equals("com.android.networkstack.tethering.inprocess"))
+//                return;
 
             Constructor<?> ctor = LinkAddress.class.getDeclaredConstructor(String.class);
             final Object mLinkAddress = ctor.newInstance(WIFI_HOST_IFACE_ADDRESS);
@@ -68,8 +97,8 @@ public class MainHook implements IXposedHookLoadPackage {
                         }
                     });
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (!packageName.equals("com.android.networkstack.tethering.inprocess"))
-                return;
+//            if (!packageName.equals("com.android.networkstack.tethering.inprocess"))
+//                return;
 
             Constructor<?> ctor = LinkAddress.class.getDeclaredConstructor(String.class);
             final Object mLinkAddress = ctor.newInstance(WIFI_HOST_IFACE_ADDRESS);
