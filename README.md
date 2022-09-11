@@ -2,6 +2,16 @@
 
 SoftAp static server IP(v4) for Android P-S (Xposed)
 
+## 注意
+如果在高版本系统上不能工作，可能是因为目标包名不对，需要自行适配。
+
+当然，你也可以选择使用不过滤包名版本，毕竟`LSPosed`提供了作用域功能
+
+## 作用域
+系统框架
+
+PS：保险起见，你也可以勾选包名包含`networkstack.tethering`的应用
+
 ## 原理
 [安卓9 固定Wifi热点IP (Xposed)](https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/)
 
@@ -17,7 +27,6 @@ SoftAp static server IP(v4) for Android P-S (Xposed)
 ```java
 private String getRandomWifiIPv4Address()
 ```
-lsposed勾选系统框架
 
 ### 安卓10
 `android.net.ip.IpServer`的`getRandomWifiIPv4Address`函数。
@@ -26,7 +35,6 @@ lsposed勾选系统框架
 ```java
 private String getRandomWifiIPv4Address()
 ```
-lsposed勾选com.android.networkstack.tethering.inprocess类似的
 
 ### 安卓11
 `android.net.ip.IpServer`的`requestIpv4Address`函数。
@@ -37,7 +45,6 @@ private LinkAddress requestIpv4Address()
 ```
 
 注意：由于该函数还被用于分配下游IP地址，所以需要先判断调用者（遍历堆栈即可），再进行替换。
-lsposed勾选com.android.networkstack.tethering.inprocess类似的
 
 ### 安卓12
 `android.net.ip.IpServer`的`requestIpv4Address`函数。
@@ -46,4 +53,8 @@ lsposed勾选com.android.networkstack.tethering.inprocess类似的
 ```java
 private LinkAddress requestIpv4Address(final boolean useLastAddress)
 ```
-lsposed勾选com.android.networkstack.tethering.inprocess类似的
+
+## 感谢
+[@mmfmkuang](https://github.com/mmfmkuang)
+
+[@dsfgdadg](https://github.com/dsfgdadg)

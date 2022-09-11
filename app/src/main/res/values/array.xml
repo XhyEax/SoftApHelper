@@ -2,7 +2,7 @@
 <resources>
     <string-array name="xposed_scope">
         <!--这里是填入需要自动勾选的应用的包名，多个就是多个item-->
-<!--        <item>android</item>-->
+        <item>android</item>
         <item>com.android.networkstack.tethering.inprocess</item>
         <item>com.android.networkstack.tethering</item>
         <item>com.google.android.networkstack.tethering.inprocess</item>
