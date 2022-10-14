@@ -1,6 +1,6 @@
 # SoftApHelper
 
-SoftAp static server IP(v4) for Android P-S (Xposed)
+SoftAp static server IP(v4) for Android P-T (Xposed)
 
 ## 下载
 [Release](https://github.com/XhyEax/SoftApHelper/releases)
@@ -58,6 +58,14 @@ private LinkAddress requestIpv4Address()
 `android.net.ip.IpServer`的`requestIpv4Address`函数。
 
 [IpServer.java#655](http://aospxref.com/android-12.0.0_r3/xref/packages/modules/Connectivity/Tethering/src/android/net/ip/IpServer.java#655)
+```java
+private LinkAddress requestIpv4Address(final boolean useLastAddress)
+```
+
+### 安卓13
+Hook点同安卓12（未测试，理论上可用）
+
+[IpServer.java#664](http://aospxref.com/android-13.0.0_r3/xref/packages/modules/Connectivity/Tethering/src/android/net/ip/IpServer.java#664)
 ```java
 private LinkAddress requestIpv4Address(final boolean useLastAddress)
 ```
