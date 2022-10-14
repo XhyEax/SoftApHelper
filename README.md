@@ -2,15 +2,23 @@
 
 SoftAp static server IP(v4) for Android P-S (Xposed)
 
-## 注意
+## 下载
+[Release](https://github.com/XhyEax/SoftApHelper/releases)
+
+### 注意
+默认设置ip为`192.168.43.1`，同时提供了`192.168.1.1`的版本。
+
 如果在高版本系统上不能工作，可能是因为目标包名不对，需要自行适配。
 
-当然，你也可以选择使用不过滤包名版本，毕竟`LSPosed`提供了作用域功能
+当然，你也可以选择使用不过滤包名版本（`non-filter`），毕竟`LSPosed`提供了作用域功能
 
 ## 作用域
 系统框架
 
 PS：保险起见，你也可以勾选包名包含`networkstack.tethering`的应用
+
+## Todo
+- [ ] 1. 增加配置页面，自定义ip和包名过滤开关
 
 ## 原理
 [安卓9 固定Wifi热点IP (Xposed)](https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/)

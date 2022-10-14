@@ -26,7 +26,6 @@ public class MainHook implements IXposedHookLoadPackage {
     private static final String callerMethodName_Q = "configureIPv4";
 
     private static final String WIFI_HOST_IFACE_ADDR = "192.168.43.1";
-    private static final String WIFI_HOST_IFACE_ADDRESS = "192.168.43.1/24";
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
@@ -34,10 +33,11 @@ public class MainHook implements IXposedHookLoadPackage {
         ClassLoader classLoader = lpparam.classLoader;
 //        XposedBridge.log("[handleLoadPackage] packageName: " + packageName);
 
-        String className = Build.VERSION.SDK_INT <= Build.VERSION_CODES.P ? className_P :
+        final String className = Build.VERSION.SDK_INT <= Build.VERSION_CODES.P ? className_P :
                 className_Q;
         final String methodName = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? methodName_R :
                 methodName_P_Q;
+        final String WIFI_HOST_IFACE_ADDRESS = WIFI_HOST_IFACE_ADDR + "/24";
 
         HashSet<String> pkgNameSet = new HashSet<>();
         pkgNameSet.add("com.android.networkstack.tethering.inprocess");
