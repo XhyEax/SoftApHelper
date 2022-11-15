@@ -18,7 +18,11 @@ SoftAp static server IP(v4) for Android P-T (Xposed)
 当然，你也可以选择使用不过滤包名版本（`non-filter`），毕竟`LSPosed`提供了作用域功能
 
 ## 作用域
+### 安卓11及以下
 系统框架
+
+### 安卓12及以上
+`com.android.networkstack.tethering.inprocess`
 
 PS：保险起见，你也可以勾选包名包含`networkstack.tethering`的应用
 
