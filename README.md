@@ -13,21 +13,24 @@ SoftAp static server IP(v4) for Android P-T (Xposed)
 
 默认设置ip为`192.168.43.1`，同时提供了`192.168.1.1`的版本。
 
-如果在高版本系统上不能工作，可能是因为目标包名不对，需要自行适配。
-
-当然，你也可以选择使用不过滤包名版本（`non-filter`），毕竟`LSPosed`提供了作用域功能
+推荐使用`LSPosed`指定作用域（已配置推荐作用域）
 
 ## 作用域
 ### 安卓11及以下
 系统框架
 
 ### 安卓12及以上
+`com.google.android.networkstack.tethering.inprocess`
 `com.android.networkstack.tethering.inprocess`
+`com.google.android.networkstack.tethering`
+`com.android.networkstack.tethering`
 
-PS：保险起见，你也可以勾选包名包含`networkstack.tethering`的应用
+PS：如果未生效，可尝试勾选包名包含`networkstack.tethering`的应用。
+
+若仍未生效，请上传`/apex/com.android.tethering/priv-app/`下的apk到[Issues](https://github.com/XhyEax/SoftApHelper/issues)。
 
 ## Todo
-- [ ] 1. 增加配置页面，自定义ip和包名过滤开关
+- [ ] 1. 增加自定义ip功能
 
 ## 原理
 [安卓9 固定Wifi热点IP (Xposed)](https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/)
