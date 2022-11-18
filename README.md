@@ -21,8 +21,11 @@ SoftAp static server IP(v4) for Android P-T (Xposed)
 
 ### 安卓12及以上
 `com.google.android.networkstack.tethering.inprocess`
+
 `com.android.networkstack.tethering.inprocess`
+
 `com.google.android.networkstack.tethering`
+
 `com.android.networkstack.tethering`
 
 PS：如果未生效，可尝试勾选包名包含`networkstack.tethering`的应用。
