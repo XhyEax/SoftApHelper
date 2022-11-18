@@ -9,7 +9,7 @@ SoftAp static server IP(v4) for Android P-T (Xposed)
 手机端使用`ifconfig`命令查看ip，或使用其他机器连接热点后，`ping 192.168.43.1`。
 
 ### 注意
-日志报错`ClassNotFoundException`，不影响正常使用。**插件生效与否请手动测试**。
+**插件生效与否请手动测试**。
 
 默认设置ip为`192.168.43.1`，同时提供了`192.168.1.1`的版本。
 
