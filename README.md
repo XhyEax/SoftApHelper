@@ -28,7 +28,7 @@ SoftAp static server IP(v4) for Android P-T (Xposed)
 
 `com.android.networkstack.tethering`
 
-PS：如果未生效，可尝试勾选包名包含`networkstack.tethering`的应用。
+PS：如果未生效，可尝试勾选更多包名包含`networkstack.tethering`的应用。
 
 若仍未生效，请上传`/apex/com.android.tethering/priv-app/`下的apk到[Issues](https://github.com/XhyEax/SoftApHelper/issues)。
 
