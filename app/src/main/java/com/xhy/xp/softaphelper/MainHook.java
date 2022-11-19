@@ -103,8 +103,10 @@ public class MainHook implements IXposedHookLoadPackage {
                             @Override
                             protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
                                 super.beforeHookedMethod(param);
+                                int mInterfaceType = ReflectUtils.findField(klass, "mInterfaceType").getInt(param.thisObject);
                                 Object mPrivateAddressCoordinator = ReflectUtils.findField(klass, "mPrivateAddressCoordinator").get(param.thisObject);
-                                if (StackUtils.isCallingFrom(className, callerMethodName_Q)) {
+                                if (mInterfaceType == TETHERING_WIFI
+                                        && StackUtils.isCallingFrom(className, callerMethodName_Q)) {
                                     if (isConflictPrefix(mPrivateAddressCoordinator, prefix)) {
                                         Log.w(TAG, "[Warning]: [" + WIFI_HOST_IFACE_ADDR + "] isConflictPrefix! do not replace.");
                                     } else {
