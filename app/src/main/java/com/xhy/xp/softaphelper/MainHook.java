@@ -1,12 +1,17 @@
 package com.xhy.xp.softaphelper;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.xposed.XposedHelpers.findClass;
 
+import android.net.IpPrefix;
 import android.net.LinkAddress;
 import android.os.Build;
+import android.util.Log;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -16,6 +21,8 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class MainHook implements IXposedHookLoadPackage {
 
+    public static final String TAG = "SoftApHelper";
+
     private static final String className_P = "com.android.server.connectivity.tethering.TetherInterfaceStateMachine";
     private static final String className_Q = "android.net.ip.IpServer";
 
@@ -24,16 +31,37 @@ public class MainHook implements IXposedHookLoadPackage {
 
     private static final String callerMethodName_Q = "configureIPv4";
 
-    private static final String WIFI_HOST_IFACE_ADDR = "192.168.43.1";
+    private static final String WIFI_HOST_IFACE_ADDR = "192.168.31.1";
+    private static final String WIFI_HOST_IFACE_ADDRESS = WIFI_HOST_IFACE_ADDR + "/24";
 
-    public Method findMethod(Class<?> klass, String methodName) {
-        for (Method m : klass.getDeclaredMethods()) {
-            m.setAccessible(true);
-            if (m.getName().equals(methodName)) {
-                return m;
-            }
+    // TetheringType
+    public static final int TETHERING_INVALID = -1;
+    public static final int TETHERING_WIFI = 0;
+    public static final int TETHERING_USB = 1;
+    public static final int TETHERING_BLUETOOTH = 2;
+    public static final int TETHERING_WIFI_P2P = 3;
+    public static final int TETHERING_NCM = 4;
+    public static final int TETHERING_ETHERNET = 5;
+    public static final int TETHERING_WIGIG = 6;
+
+    private boolean isConflictPrefix(Object mPrivateAddressCoordinator, IpPrefix prefix) throws Exception {
+        Class<?> privateAddressCoordinator = mPrivateAddressCoordinator.getClass();
+        // Android 12+
+        Method m_getConflictPrefix = ReflectUtils.findMethod(privateAddressCoordinator, "getConflictPrefix");
+        if (m_getConflictPrefix != null) {
+            return m_getConflictPrefix.invoke(mPrivateAddressCoordinator, prefix) != null;
         }
-        return null;
+
+        // Android 11
+        Method m_isDownstreamPrefixInUse = ReflectUtils.findMethod(privateAddressCoordinator, "isDownstreamPrefixInUse");
+        Method m_isConflictWithUpstream = ReflectUtils.findMethod(privateAddressCoordinator, "isConflictWithUpstream");
+        if (m_isDownstreamPrefixInUse != null && m_isConflictWithUpstream != null) {
+            return (boolean) m_isDownstreamPrefixInUse.invoke(mPrivateAddressCoordinator, prefix) ||
+                    (boolean) m_isConflictWithUpstream.invoke(mPrivateAddressCoordinator, prefix);
+        }
+
+        Log.e(TAG, "[Error]: [isConflictPrefix] method not found.");
+        return false;
     }
 
     @Override
@@ -45,7 +73,6 @@ public class MainHook implements IXposedHookLoadPackage {
                 className_Q;
         final String methodName = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? methodName_R :
                 methodName_P_Q;
-        final String WIFI_HOST_IFACE_ADDRESS = WIFI_HOST_IFACE_ADDR + "/24";
 
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P ||
                 Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
@@ -58,13 +85,16 @@ public class MainHook implements IXposedHookLoadPackage {
                         }
                     });
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Constructor<?> ctor = LinkAddress.class.getDeclaredConstructor(String.class);
-            final Object mLinkAddress = ctor.newInstance(WIFI_HOST_IFACE_ADDRESS);
+            Constructor<?> ctor_LinkAddress = LinkAddress.class.getDeclaredConstructor(String.class);
+            final LinkAddress mLinkAddress = (LinkAddress) ctor_LinkAddress.newInstance(WIFI_HOST_IFACE_ADDRESS);
+            Constructor<?> ctor_IpPrefix = IpPrefix.class.getDeclaredConstructor(String.class);
+            final IpPrefix prefix = (IpPrefix) ctor_IpPrefix.newInstance(WIFI_HOST_IFACE_ADDRESS);
+
             try {
                 Class<?> klass = classLoader.loadClass(className);
-                Method method = findMethod(klass, methodName);
+                Method method = ReflectUtils.findMethod(klass, methodName);
                 if (method == null) {
-                    XposedBridge.log("[Error]: [" + methodName + "] not found in " + klass.getName());
+                    Log.e(TAG, "[Error]: [" + methodName + "] not found in " + klass.getName());
                     return;
                 }
 
@@ -73,9 +103,13 @@ public class MainHook implements IXposedHookLoadPackage {
                             @Override
                             protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
                                 super.beforeHookedMethod(param);
-//                            XposedBridge.log(StackUtils.getStackTraceString());
+                                Object mPrivateAddressCoordinator = ReflectUtils.findField(klass, "mPrivateAddressCoordinator").get(param.thisObject);
                                 if (StackUtils.isCallingFrom(className, callerMethodName_Q)) {
-                                    param.setResult(mLinkAddress);
+                                    if (isConflictPrefix(mPrivateAddressCoordinator, prefix)) {
+                                        Log.w(TAG, "[Warning]: [" + WIFI_HOST_IFACE_ADDR + "] isConflictPrefix! do not replace.");
+                                    } else {
+                                        param.setResult(mLinkAddress);
+                                    }
                                 }
                             }
                         });

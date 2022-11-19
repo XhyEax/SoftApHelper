@@ -9,12 +9,13 @@ SoftAp static server IP(v4) for Android P-T (Xposed)
 手机端使用`ifconfig`命令查看ip，或使用其他机器连接热点后，`ping 192.168.43.1`。
 
 ### 注意
-**插件生效与否请手动测试**。
+**网络前缀冲突**会导致网络连接失败（Android 10及以下）或仍使用随机IP（Android 11及以上，日志提示`isConflictPrefix`）。建议开启热点时不连接其他网络。
 
-默认设置ip为`192.168.43.1`，同时提供了`192.168.1.1`版本（部分机型不支持`43.1`）。
+默认设置ip为`192.168.43.1`，同时提供了`192.168.1.1`版本（~~~好像更容易冲突了~~~）。
 
 推荐使用`LSPosed`指定作用域（已配置推荐作用域）
 
+从[v1.040](https://github.com/XhyEax/SoftApHelper/releases/tag/v1.040)开始，模块只对Wifi热点生效。其他网络类型可使用[v1.030](https://github.com/XhyEax/SoftApHelper/releases/tag/v1.030)版本
 ## 作用域
 ### 安卓11及以下
 系统框架
@@ -33,7 +34,8 @@ PS：如果未生效，可尝试勾选更多包名包含`networkstack.tethering`
 若仍未生效，请上传`/apex/com.android.tethering/priv-app/`下的apk到[Issues](https://github.com/XhyEax/SoftApHelper/issues)。
 
 ## Todo
-- [ ] 1. 增加自定义ip功能
+- [ ] 自定义ip
+- [ ] 自定义生效的网络类型
 
 ## 原理
 [安卓9 固定Wifi热点IP (Xposed)](https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/)
@@ -67,7 +69,8 @@ private String getRandomWifiIPv4Address()
 private LinkAddress requestIpv4Address()
 ```
 
-注意：由于该函数还被用于分配下游IP地址，所以需要先判断调用者（遍历堆栈即可），再进行替换。
+由于该函数还被用于其他方式的网络共享及更换前缀，所以需要判断网络类型（`mInterfaceType == TETHERING_WIFI`）和调用者（遍历堆栈查找`configureIPv4`），最后进行替换。
+
 
 ### 安卓12
 `android.net.ip.IpServer`的`requestIpv4Address`函数。
