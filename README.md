@@ -20,7 +20,7 @@ SoftAp static server IP(v4) for Android P-T (Xposed)
 ### 安卓11及以下
 系统框架
 
-### 安卓12及以上
+### 安卓12及以上（以及部分安卓11设备）
 `com.google.android.networkstack.tethering.inprocess`
 
 `com.android.networkstack.tethering.inprocess`
