@@ -13,7 +13,7 @@ SoftAp static server IP(v4) for Android P-T (Xposed)
 
 默认设置ip为`192.168.43.1`，同时提供了`192.168.1.1`版本（~~好像更容易冲突了~~）。
 
-从[v1.040](https://github.com/XhyEax/SoftApHelper/releases/tag/v1.040)开始，模块只对Wifi热点生效。其他网络类型可使用[v1.030](https://github.com/XhyEax/SoftApHelper/releases/tag/v1.030)版本
+从[v1.040](https://github.com/XhyEax/SoftApHelper/releases/tag/v1.040)开始，模块默认只对Wifi热点生效。（提供了所有网络类型版本`all`）
 
 推荐使用`LSPosed`指定作用域（已配置推荐作用域）
 ## 作用域
