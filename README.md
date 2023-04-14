@@ -11,7 +11,7 @@ SoftAp static server IP(v4) for Android P-T (Xposed)
 ### 注意
 **网络前缀冲突**会导致网络连接失败（`Android 10`及以下）或仍使用随机IP（`Android 11`及以上，日志提示`isConflictPrefix`）。
 
-默认设置ip为`192.168.43.1`，同时提供了`192.168.1.1`版本（~~好像更容易冲突了~~）。
+wifi热点为`192.168.43.1`，同时提供了`192.168.1.1`版本（`43.1`**连不上的先试试这个**）。
 
 从`v1.040`开始，提供`wifionly`和`all`版本，支持设置`WIFI`、`USB`、`蓝牙`的热点IP（`Android 11`及以上）。
 
