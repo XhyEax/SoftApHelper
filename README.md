@@ -9,11 +9,19 @@ SoftAp static server IP(v4) for Android P-T (Xposed)
 开启热点后，手机端使用`ifconfig`命令查看ip。或使用其他机器连接热点后，`ping 192.168.43.1`。
 
 ### 注意
-**网络前缀冲突**会导致网络连接失败（Android 10及以下）或仍使用随机IP（Android 11及以上，日志提示`isConflictPrefix`）。
+**网络前缀冲突**会导致网络连接失败（`Android 10`及以下）或仍使用随机IP（`Android 11`及以上，日志提示`isConflictPrefix`）。
 
 默认设置ip为`192.168.43.1`，同时提供了`192.168.1.1`版本（~~好像更容易冲突了~~）。
 
-从[v1.040](https://github.com/XhyEax/SoftApHelper/releases/tag/v1.040)开始，模块默认只对Wifi热点生效。（提供了所有网络类型版本`all`）
+从`v1.040`开始，提供`wifionly`和`all`版本，支持设置`WIFI`、`USB`、`蓝牙`的热点IP（`Android 11`及以上）。
+
+
+|                         |                       |
+|-------------------------|-----------------------|
+| WIFI | WIFI_HOST_IFACE_ADDR  |
+| USB  | 192.168.42.1          |
+| BlueTooth   | 192.168.44.1          |
+
 
 推荐使用`LSPosed`指定作用域（已配置推荐作用域）
 ## 作用域

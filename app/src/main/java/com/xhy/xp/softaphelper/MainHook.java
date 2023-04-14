@@ -1,7 +1,6 @@
 package com.xhy.xp.softaphelper;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
-import static de.robv.android.xposed.XposedHelpers.findClass;
 
 import android.net.IpPrefix;
 import android.net.LinkAddress;
@@ -9,9 +8,8 @@ import android.os.Build;
 import android.util.Log;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
+import java.util.HashMap;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -32,7 +30,6 @@ public class MainHook implements IXposedHookLoadPackage {
     private static final String callerMethodName_Q = "configureIPv4";
 
     private static final String WIFI_HOST_IFACE_ADDR = "192.168.43.1";
-    private static final String WIFI_HOST_IFACE_ADDRESS = WIFI_HOST_IFACE_ADDR + "/24";
 
     // TetheringType
     public static final int TETHERING_INVALID = -1;
@@ -43,6 +40,18 @@ public class MainHook implements IXposedHookLoadPackage {
     public static final int TETHERING_NCM = 4;
     public static final int TETHERING_ETHERNET = 5;
     public static final int TETHERING_WIGIG = 6;
+
+    private static final String WIFI_HOST_IFACE_ADDRESS = WIFI_HOST_IFACE_ADDR + "/24";
+    private static final String USB_HOST_IFACE_ADDRESS = "192.168.42.1/24";
+    private static final String BT_HOST_IFACE_ADDRESS = "192.168.44.1/24";
+
+    private static HashMap<Integer, String> AddressMap = new HashMap<>();
+
+    static {
+        AddressMap.put(TETHERING_WIFI, WIFI_HOST_IFACE_ADDRESS);
+        AddressMap.put(TETHERING_USB, USB_HOST_IFACE_ADDRESS);
+        AddressMap.put(TETHERING_BLUETOOTH, BT_HOST_IFACE_ADDRESS);
+    }
 
     private boolean isConflictPrefix(Object mPrivateAddressCoordinator, IpPrefix prefix) throws Exception {
         Class<?> privateAddressCoordinator = mPrivateAddressCoordinator.getClass();
@@ -85,12 +94,10 @@ public class MainHook implements IXposedHookLoadPackage {
                         }
                     });
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Constructor<?> ctor_LinkAddress = LinkAddress.class.getDeclaredConstructor(String.class);
-            final LinkAddress mLinkAddress = (LinkAddress) ctor_LinkAddress.newInstance(WIFI_HOST_IFACE_ADDRESS);
-            Constructor<?> ctor_IpPrefix = IpPrefix.class.getDeclaredConstructor(String.class);
-            final IpPrefix prefix = (IpPrefix) ctor_IpPrefix.newInstance(WIFI_HOST_IFACE_ADDRESS);
-
             try {
+                Constructor<?> ctor_LinkAddress = LinkAddress.class.getDeclaredConstructor(String.class);
+                Constructor<?> ctor_IpPrefix = IpPrefix.class.getDeclaredConstructor(String.class);
+
                 Class<?> klass = classLoader.loadClass(className);
                 Method method = ReflectUtils.findMethod(klass, methodName);
                 if (method == null) {
@@ -104,8 +111,15 @@ public class MainHook implements IXposedHookLoadPackage {
                             protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
                                 super.beforeHookedMethod(param);
                                 int mInterfaceType = ReflectUtils.findField(klass, "mInterfaceType").getInt(param.thisObject);
+
+                                String address = AddressMap.get(mInterfaceType);
+
+                                final LinkAddress mLinkAddress = (LinkAddress) ctor_LinkAddress.newInstance(address);
+                                final IpPrefix prefix = (IpPrefix) ctor_IpPrefix.newInstance(address);
+
                                 Object mPrivateAddressCoordinator = ReflectUtils.findField(klass, "mPrivateAddressCoordinator").get(param.thisObject);
-                                if (mInterfaceType == TETHERING_WIFI && StackUtils.isCallingFrom(className, callerMethodName_Q)) {
+
+                                if (address != null && StackUtils.isCallingFrom(className, callerMethodName_Q)) {
                                     if (isConflictPrefix(mPrivateAddressCoordinator, prefix)) {
                                         Log.w(TAG, "[Warning]: [" + WIFI_HOST_IFACE_ADDR + "] isConflictPrefix! do not replace.");
                                     } else {
