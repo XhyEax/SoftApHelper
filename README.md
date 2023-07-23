@@ -89,7 +89,7 @@ private LinkAddress requestIpv4Address(final boolean useLastAddress)
 ```
 
 ### 安卓13
-Hook点同安卓12（未测试，理论上可用）
+Hook点同安卓12
 
 [IpServer.java#664](http://aospxref.com/android-13.0.0_r3/xref/packages/modules/Connectivity/Tethering/src/android/net/ip/IpServer.java#664)
 ```java
