@@ -5,8 +5,12 @@ SoftAp static server IP(v4) for Android P-T (Xposed)
 ## 下载
 [Release](https://github.com/XhyEax/SoftApHelper/releases)
 
-## 连接测试
+## 连接测试&问题反馈
 开启热点后，手机端使用`ifconfig`命令查看ip（或usb连接电脑后，进入`adb shell`执行）。或使用其他机器连接热点后，`ping 192.168.43.1`。
+
+如果插件未生效，作用域可尝试勾选更多包名包含`networkstack.tethering`的应用。
+
+若仍未生效，请上传设备执行`ifconfig`的结果，以及`/apex/com.android.tethering/priv-app/`下的apk到[Issues](https://github.com/XhyEax/SoftApHelper/issues)。
 
 ### 注意
 **网络前缀冲突**会导致网络连接失败（`Android 10`及以下）或仍使用随机IP（`Android 11`及以上，日志提示`isConflictPrefix`）。
@@ -36,10 +40,6 @@ wifi热点为`192.168.43.1`，同时提供了`192.168.1.1`版本（`43.1`**连�
 `com.google.android.networkstack.tethering`
 
 `com.android.networkstack.tethering`
-
-PS：如果未生效，可尝试勾选更多包名包含`networkstack.tethering`的应用。
-
-若仍未生效，请上传设备执行`ifconfig`的结果，以及`/apex/com.android.tethering/priv-app/`下的apk到[Issues](https://github.com/XhyEax/SoftApHelper/issues)。
 
 ## Todo
 - [ ] 自定义ip
