@@ -33,6 +33,8 @@ wifi热点为`192.168.43.1`，同时提供了`192.168.1.1`版本（`43.1`**连�
 系统框架
 
 ### 安卓12及以上（以及部分安卓11设备）
+系统框架（一般只钩这个就可以了，勾选Tethering是保险起见）
+
 `com.google.android.networkstack.tethering.inprocess`
 
 `com.android.networkstack.tethering.inprocess`
