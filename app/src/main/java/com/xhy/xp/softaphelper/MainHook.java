@@ -4,12 +4,17 @@ import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
 import android.net.IpPrefix;
 import android.net.LinkAddress;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.util.Log;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -47,6 +52,31 @@ public class MainHook implements IXposedHookLoadPackage {
 
     private static HashMap<Integer, String> AddressMap = new HashMap<>();
 
+
+    public static final int WIFI_BAND_INDEX_24_GHZ = 0;
+    public static final int WIFI_BAND_INDEX_5_GHZ = 1;
+    public static final int WIFI_BAND_INDEX_5_GHZ_DFS_ONLY = 2;
+    public static final int WIFI_BAND_INDEX_6_GHZ = 3;
+    public static final int WIFI_BAND_INDEX_60_GHZ = 4;
+    public static final int WIFI_BAND_COUNT = 5;
+
+    /** no band specified; use channel list instead */
+    public static final int WIFI_BAND_UNSPECIFIED = 0;
+    /** 2.4 GHz band */
+    public static final int WIFI_BAND_24_GHZ = 1 << WIFI_BAND_INDEX_24_GHZ;
+    /** 5 GHz band excluding DFS channels */
+    public static final int WIFI_BAND_5_GHZ = 1 << WIFI_BAND_INDEX_5_GHZ;
+    /** DFS channels from 5 GHz band only */
+    public static final int WIFI_BAND_5_GHZ_DFS_ONLY  = 1 << WIFI_BAND_INDEX_5_GHZ_DFS_ONLY;
+    /** 6 GHz band */
+    public static final int WIFI_BAND_6_GHZ = 1 << WIFI_BAND_INDEX_6_GHZ;
+    /** 60 GHz band */
+    public static final int WIFI_BAND_60_GHZ = 1 << WIFI_BAND_INDEX_60_GHZ;
+
+    // channel: 149,153,157,161,165
+    // freq:    5745,5765,5785,5805,5825
+    private static HashSet<Integer> AvailableChannelSet = new HashSet<>(Arrays.asList(5745,5765,5785,5805,5825));
+
     static {
         AddressMap.put(TETHERING_WIFI, WIFI_HOST_IFACE_ADDRESS);
         AddressMap.put(TETHERING_USB, USB_HOST_IFACE_ADDRESS);
@@ -76,8 +106,9 @@ public class MainHook implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         ClassLoader classLoader = lpparam.classLoader;
-//        XposedBridge.log("[handleLoadPackage] packageName: " + lpparam.packageName);
+//        Log.e(TAG, "[handleLoadPackage] packageName: " + lpparam.packageName);
 
+        // 固定热点ip
         final String className = Build.VERSION.SDK_INT <= Build.VERSION_CODES.P ? className_P :
                 className_Q;
         final String methodName = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? methodName_R :
@@ -129,9 +160,10 @@ public class MainHook implements IXposedHookLoadPackage {
                             }
                         });
             } catch (ClassNotFoundException exception) {
-//                XposedBridge.log("ClassNotFoundException in " + lpparam.packageName);
+                Log.e(TAG, "ClassNotFoundException in " + lpparam.packageName);
             }
         }
+
     }
 
 
