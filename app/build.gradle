@@ -3,14 +3,14 @@ plugins {
 }
 
 android {
-    compileSdk 31
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.xhy.xp.softaphelper"
         minSdk 23
-        targetSdk 31
-        versionCode 1050
-        versionName "1.050"
+        targetSdk 33
+        versionCode 1070
+        versionName "1.070"
     }
 
     buildTypes {
@@ -23,6 +23,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    namespace 'com.xhy.xp.softaphelper'
 }
 
 dependencies {

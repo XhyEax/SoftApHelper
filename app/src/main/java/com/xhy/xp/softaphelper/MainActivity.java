@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends Activity {
 
@@ -13,11 +14,13 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ArrayList<String> pkgNameList = new ArrayList<>();
-        pkgNameList.add("com.android.networkstack.tethering.inprocess");
-        pkgNameList.add("com.android.networkstack.tethering");
-        pkgNameList.add("com.google.android.networkstack.tethering.inprocess");
-        pkgNameList.add("com.google.android.networkstack.tethering");
+        ArrayList<String> pkgNameList = new ArrayList<>(
+                Arrays.asList(
+                        "com.android.networkstack.tethering.inprocess",
+                        "com.android.networkstack.tethering",
+                        "com.google.android.networkstack.tethering.inprocess",
+                        "com.google.android.networkstack.tethering"
+                ));
 
         StringBuilder sb = new StringBuilder("Installed App (if not found, select android):\n");
         for (String pkgName: pkgNameList ) {
