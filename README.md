@@ -1,6 +1,6 @@
 # SoftApHelper
 
-SoftAp static server IP(v4) for Android P-T (Xposed)
+SoftAp static server IP(v4) for Android 9+ (Xposed)
 
 ## 下载
 [Release](https://github.com/XhyEax/SoftApHelper/releases)
@@ -22,7 +22,7 @@ SoftAp static server IP(v4) for Android P-T (Xposed)
 `com.android.networkstack.tethering`
 
 ## 连接测试&问题反馈
-开启热点后，手机端使用`ifconfig`命令查看ip（或usb连接电脑后，进入`adb shell`执行）。或使用其他机器连接热点后，`ping 192.168.43.1`。
+开启热点后，手机端使用`ifconfig`命令查看IP（或usb连接电脑后，进入`adb shell`执行）。或使用其他机器连接热点后，`ping 192.168.43.1`。
 
 如果插件未生效，作用域可尝试勾选更多包名包含`networkstack.tethering`的应用。
 
@@ -43,8 +43,9 @@ wifi热点为`192.168.43.1`，同时提供了`192.168.1.1`版本（使用`43.1`*
 | BlueTooth   | 192.168.44.1          |
 
 ## Todo
-- [ ] 自定义ip
+- [ ] 自定义IP
 - [ ] 自定义生效的网络类型
+- [ ] 自定义5G信道
 
 ## 原理
 [安卓9 固定Wifi热点IP (Xposed)](https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/)
@@ -53,7 +54,7 @@ wifi热点为`192.168.43.1`，同时提供了`192.168.1.1`版本（使用`43.1`*
 
 [安卓12 固定Wifi热点IP (Xposed)](https://blog.xhyeax.com/2022/07/06/android-12-hostpot-set-ip/)
 
-## Hook点
+## 固定热点IP-Hook点
 ### 安卓9
 `com.android.server.connectivity.tethering.TetherInterfaceStateMachine`的`getRandomWifiIPv4Address`函数。
 
@@ -96,6 +97,17 @@ Hook点同安卓12
 ```java
 private LinkAddress requestIpv4Address(final boolean useLastAddress)
 ```
+
+### 安卓14
+Hook点同安卓12
+
+```java
+private LinkAddress requestIpv4Address(final boolean useLastAddress)
+```
+
+## 固定5G热点信道-Hook点
+### 安卓12
+详见Hook代码。
 
 ## 感谢
 [@mmfmkuang](https://github.com/mmfmkuang)
