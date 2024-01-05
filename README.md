@@ -4,6 +4,22 @@ SoftAp static server IP(v4) for Android 9+
 
 SoftAp 5G channel and bandwidth lock for Android 13+ 
 
+### 注意
+**网络前缀冲突**会导致网络连接失败（`Android 10`及以下）或仍使用随机IP（`Android 11`及以上，日志提示`isConflictPrefix`）。
+
+wifi热点为`192.168.43.1`，同时提供了`192.168.1.1`版本（使用`43.1`**连不上的先试试这个**）。
+
+支持设置`WIFI`、`USB`、`蓝牙`的热点IP（`Android 11`及以上）。
+
+
+|           Type          |         IP              |
+|-------------------------|-----------------------|
+| WIFI | WIFI_HOST_IFACE_ADDR  |
+| USB  | 192.168.42.1          |
+| BlueTooth   | 192.168.44.1          |
+
+安卓13+固定5G热点信道：如果开启5G热点时，未指定5G信道(单个channel或者allowedAcsChannels)，锁定频段为`149,153,157,161,165`，频宽为`320MHZ`(受硬件限制，实际可能只有`80MHZ`)。
+
 ## 下载
 [Release](https://github.com/XhyEax/SoftApHelper/releases)
 
@@ -31,20 +47,6 @@ SoftAp 5G channel and bandwidth lock for Android 13+
 如果插件未生效，作用域可尝试勾选更多包名包含`networkstack.tethering`的应用。
 
 若仍未生效，请上传设备执行`ifconfig`的结果，以及`/apex/com.android.tethering/priv-app/`下的apk到[Issues](https://github.com/XhyEax/SoftApHelper/issues)。
-
-### 注意
-**网络前缀冲突**会导致网络连接失败（`Android 10`及以下）或仍使用随机IP（`Android 11`及以上，日志提示`isConflictPrefix`）。
-
-wifi热点为`192.168.43.1`，同时提供了`192.168.1.1`版本（使用`43.1`**连不上的先试试这个**）。
-
-支持设置`WIFI`、`USB`、`蓝牙`的热点IP（`Android 11`及以上）。
-
-
-|           Type          |         IP              |
-|-------------------------|-----------------------|
-| WIFI | WIFI_HOST_IFACE_ADDR  |
-| USB  | 192.168.42.1          |
-| BlueTooth   | 192.168.44.1          |
 
 ## Todo
 - [ ] 自定义IP
@@ -113,7 +115,7 @@ private LinkAddress requestIpv4Address(final boolean useLastAddress)
 ### 方法1：使用本插件
 （TODO）安卓12及以下：指定AP频段为特定信道。
 
-安卓13+：如果开启5G热点时，未指定5G信道(单个channel或者allowedAcsChannels)，锁定频段为`149,153,157,161,165`，频宽为`320MHZ`(受硬件限制，实际可能只有80MHZ)。
+安卓13+：如果开启5G热点时，未指定5G信道(单个channel或者allowedAcsChannels)，锁定频段为`149,153,157,161,165`，频宽为`320MHZ`(受硬件限制，实际可能只有`80MHZ`)。
 
 ### 方法2：使用VPNHotspot
 使用[VPNHotspot](https://github.com/Mygod/VPNHotspot)设置系统热点配置。
