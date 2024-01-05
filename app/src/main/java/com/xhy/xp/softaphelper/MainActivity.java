@@ -2,6 +2,7 @@ package com.xhy.xp.softaphelper;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -23,21 +24,26 @@ public class MainActivity extends Activity {
                 ));
 
         StringBuilder sb = new StringBuilder("Installed App (if not found, select android):\n");
-        for (String pkgName: pkgNameList ) {
-            if(isInstalled(pkgName)){
+        for (String pkgName : pkgNameList) {
+            if (isInstalled(pkgName)) {
                 sb.append(pkgName);
             }
         }
 
-        sb.append("Tips: 5G channel and bandwidth lock for Android 13+ only");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2){
+            sb.append("5G channel and bandwidth lock enabled!");
+        }else{
+            sb.append("Tips: 5G channel and bandwidth lock for Android 13+ only");
+        }
+
         TextView textView = findViewById(R.id.sample_text);
         textView.setText(sb.toString());
     }
 
-    public boolean isInstalled(String pkgName){
+    public boolean isInstalled(String pkgName) {
         PackageManager packageManager = this.getApplicationContext().getPackageManager();
         try {
-            packageManager.getApplicationInfo(pkgName,PackageManager.GET_UNINSTALLED_PACKAGES);
+            packageManager.getApplicationInfo(pkgName, PackageManager.GET_UNINSTALLED_PACKAGES);
         } catch (PackageManager.NameNotFoundException e) {
             return false;
         }
