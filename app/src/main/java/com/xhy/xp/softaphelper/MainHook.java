@@ -4,22 +4,28 @@ import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
 import android.net.IpPrefix;
 import android.net.LinkAddress;
+import android.net.wifi.SoftApConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.util.Log;
+import android.util.SparseIntArray;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class MainHook implements IXposedHookLoadPackage {
@@ -53,29 +59,12 @@ public class MainHook implements IXposedHookLoadPackage {
     private static HashMap<Integer, String> AddressMap = new HashMap<>();
 
 
-    public static final int WIFI_BAND_INDEX_24_GHZ = 0;
-    public static final int WIFI_BAND_INDEX_5_GHZ = 1;
-    public static final int WIFI_BAND_INDEX_5_GHZ_DFS_ONLY = 2;
-    public static final int WIFI_BAND_INDEX_6_GHZ = 3;
-    public static final int WIFI_BAND_INDEX_60_GHZ = 4;
-    public static final int WIFI_BAND_COUNT = 5;
-
-    /** no band specified; use channel list instead */
-    public static final int WIFI_BAND_UNSPECIFIED = 0;
-    /** 2.4 GHz band */
-    public static final int WIFI_BAND_24_GHZ = 1 << WIFI_BAND_INDEX_24_GHZ;
-    /** 5 GHz band excluding DFS channels */
-    public static final int WIFI_BAND_5_GHZ = 1 << WIFI_BAND_INDEX_5_GHZ;
-    /** DFS channels from 5 GHz band only */
-    public static final int WIFI_BAND_5_GHZ_DFS_ONLY  = 1 << WIFI_BAND_INDEX_5_GHZ_DFS_ONLY;
-    /** 6 GHz band */
-    public static final int WIFI_BAND_6_GHZ = 1 << WIFI_BAND_INDEX_6_GHZ;
-    /** 60 GHz band */
-    public static final int WIFI_BAND_60_GHZ = 1 << WIFI_BAND_INDEX_60_GHZ;
-
+    public static final int BAND_5GHZ = 1 << 1;
+    public static final int CHANNEL_WIDTH_320MHZ = 11;
     // channel: 149,153,157,161,165
     // freq:    5745,5765,5785,5805,5825
-    private static HashSet<Integer> AvailableChannelSet = new HashSet<>(Arrays.asList(5745,5765,5785,5805,5825));
+    private static HashSet<Integer> AvailableChannelSet = new HashSet<>(Arrays.asList(149, 153, 157, 161, 165));
+    private static HashSet<Integer> AvailableChannelFreqSet = new HashSet<>(Arrays.asList(5745, 5765, 5785, 5805, 5825));
 
     static {
         AddressMap.put(TETHERING_WIFI, WIFI_HOST_IFACE_ADDRESS);
@@ -106,7 +95,9 @@ public class MainHook implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         ClassLoader classLoader = lpparam.classLoader;
-//        Log.e(TAG, "[handleLoadPackage] packageName: " + lpparam.packageName);
+        Log.e(TAG, "[handleLoadPackage] packageName: "
+                + lpparam.packageName + "-" + lpparam.processName + "-" + classLoader
+        );
 
         // 固定热点ip
         final String className = Build.VERSION.SDK_INT <= Build.VERSION_CODES.P ? className_P :
@@ -159,8 +150,53 @@ public class MainHook implements IXposedHookLoadPackage {
                                 }
                             }
                         });
-            } catch (ClassNotFoundException exception) {
-                Log.e(TAG, "ClassNotFoundException in " + lpparam.packageName);
+            } catch (Exception exception) {
+//                Log.e(TAG, "exception in " + lpparam.packageName);
+            }
+        }
+
+        //固定5G热点信道 (Android 9-11)
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P ||
+                Build.VERSION.SDK_INT == Build.VERSION_CODES.Q |
+                        Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+            // TODO
+        }
+        // Android 12+
+        else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
+            // TODO
+        }
+        // Android 13+
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
+            try {
+                for (Constructor<?> ctor : SoftApConfiguration.class.getDeclaredConstructors()) {
+                    XposedBridge.hookMethod(ctor,
+                            new XC_MethodHook() {
+                                @Override
+                                protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+                                    super.beforeHookedMethod(param);
+
+                                    SparseIntArray channels = (SparseIntArray) param.args[4];
+
+//                                    Set<Integer> allowedAcsChannels5g = (Set<Integer>) param.args[21];
+//                                    int maxChannelBandwidth = (int) param.args[23];
+//                                    Log.e(TAG, "orig channels " + channels);
+//                                    Log.e(TAG, "orig allowedAcsChannels5g " + allowedAcsChannels5g);
+//                                    Log.e(TAG, "orig maxChannelBandwidth " + maxChannelBandwidth);
+
+                                    // set 5G channel
+                                    int channel = channels.get(BAND_5GHZ);
+                                    if (channel == 0 || !AvailableChannelSet.contains(channel)) {
+                                        // 5G ACS channels
+                                        param.args[21] = AvailableChannelSet;
+                                        // max bandwidth
+                                        param.args[23] = CHANNEL_WIDTH_320MHZ;
+                                    }
+                                }
+                            });
+                }
+
+            } catch (Exception exception) {
+//                Log.e(TAG, "exception in " + lpparam.packageName + ": " + exception);
             }
         }
 

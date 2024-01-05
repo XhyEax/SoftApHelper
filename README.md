@@ -108,7 +108,7 @@ private LinkAddress requestIpv4Address(final boolean useLastAddress)
 ## 固定5G热点信道
 ### 方法1：使用本插件
 （TODO）安卓12以下：指定AP频段为特定信道。
-安卓13+：如果开启5G热点时，未指定5G信道(单个channel或者allowedAcsChannels)，锁定频段为`149,153,157,161,165`，频宽为`320MHZ`。
+安卓13+：如果开启5G热点时，未指定5G信道(单个channel或者allowedAcsChannels)，锁定频段为`149,153,157,161,165`，频宽为`320MHZ`(受硬件限制，实际可能只有80MHZ)。
 
 ### 方法2：使用VPNHotspot
 使用[VPNHotspot](https://github.com/Mygod/VPNHotspot)设置系统热点配置。
