@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
             }
         }
 
-        sb.append("Tips: run `cmd wifi start-softap APName wpa2 12345678 -b 5 -f freq` as root to set 5G freq");
+        sb.append("Tips: 5G channel and bandwidth lock for Android 13+ only");
         TextView textView = findViewById(R.id.sample_text);
         textView.setText(sb.toString());
     }
