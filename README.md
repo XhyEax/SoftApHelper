@@ -105,9 +105,10 @@ Hook点同安卓12
 private LinkAddress requestIpv4Address(final boolean useLastAddress)
 ```
 
-## 固定5G热点信道-Hook点
-### 安卓12
-详见Hook代码。
+## 固定5G热点信道
+使用[VPNHotspot](https://github.com/Mygod/VPNHotspot)设置系统热点配置。
+安卓11以下：指定AP频段为特定信道。
+安卓12+：指定频段为5G，ACS可选频段为信道，或指定AP频段为特定信道。
 
 ## 感谢
 [@mmfmkuang](https://github.com/mmfmkuang)

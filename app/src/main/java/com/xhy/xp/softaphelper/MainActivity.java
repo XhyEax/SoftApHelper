@@ -28,6 +28,8 @@ public class MainActivity extends Activity {
                 sb.append(pkgName);
             }
         }
+
+        sb.append("Tips: run `cmd wifi start-softap APName wpa2 12345678 -b 5 -f freq` as root to set 5G freq");
         TextView textView = findViewById(R.id.sample_text);
         textView.setText(sb.toString());
     }
