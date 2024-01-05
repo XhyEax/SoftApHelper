@@ -2,6 +2,8 @@
 
 SoftAp static server IP(v4) for Android 9+ (Xposed)
 
+SoftAp 5G channel and bandwidth lock for Android 13+ (Xposed)
+
 ## 下载
 [Release](https://github.com/XhyEax/SoftApHelper/releases)
 
