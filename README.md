@@ -13,6 +13,8 @@ SoftAp 5G channel and bandwidth lock for Android 13+
 系统框架
 
 ### 安卓12及以上（以及部分安卓11设备）
+注意：高版本LSPosed勾选Tethering失败是正常现象，不影响插件生效
+
 系统框架（一般只钩这个就可以了，勾选Tethering是保险起见）
 
 `com.google.android.networkstack.tethering.inprocess`
