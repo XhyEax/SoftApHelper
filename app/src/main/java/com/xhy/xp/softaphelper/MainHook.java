@@ -55,6 +55,7 @@ public class MainHook implements IXposedHookLoadPackage {
     private static final String WIFI_HOST_IFACE_ADDRESS = WIFI_HOST_IFACE_ADDR + "/24";
     private static final String USB_HOST_IFACE_ADDRESS = "192.168.42.1/24";
     private static final String BT_HOST_IFACE_ADDRESS = "192.168.44.1/24";
+    private static final String P2P_HOST_IFACE_ADDRESS = "192.168.49.1/24";
 
     private static HashMap<Integer, String> AddressMap = new HashMap<>();
 
@@ -70,6 +71,7 @@ public class MainHook implements IXposedHookLoadPackage {
         AddressMap.put(TETHERING_WIFI, WIFI_HOST_IFACE_ADDRESS);
         AddressMap.put(TETHERING_USB, USB_HOST_IFACE_ADDRESS);
         AddressMap.put(TETHERING_BLUETOOTH, BT_HOST_IFACE_ADDRESS);
+        AddressMap.put(TETHERING_WIFI_P2P, P2P_HOST_IFACE_ADDRESS);
     }
 
     private boolean isConflictPrefix(Object mPrivateAddressCoordinator, IpPrefix prefix) throws Exception {
