@@ -64,8 +64,9 @@ public class MainHook implements IXposedHookLoadPackage {
     public static final int CHANNEL_WIDTH_320MHZ = 11;
     // channel: 149,153,157,161,165
     // freq:    5745,5765,5785,5805,5825
-    private static HashSet<Integer> AvailableChannelSet = new HashSet<>(Arrays.asList(149, 153, 157, 161, 165));
-    private static HashSet<Integer> AvailableChannelFreqSet = new HashSet<>(Arrays.asList(5745, 5765, 5785, 5805, 5825));
+    private static HashSet<Integer> AvailableChannelSet_LOW = new HashSet<>(Arrays.asList(36, 40, 44));
+    private static HashSet<Integer> AvailableChannelSet_HIGH = new HashSet<>(Arrays.asList(149, 153, 157, 161, 165));
+//    private static HashSet<Integer> AvailableChannelFreqSet = new HashSet<>(Arrays.asList(5745, 5765, 5785, 5805, 5825));
 
     static {
         AddressMap.put(TETHERING_WIFI, WIFI_HOST_IFACE_ADDRESS);
@@ -187,14 +188,14 @@ public class MainHook implements IXposedHookLoadPackage {
 //                                    Log.e(TAG, "orig allowedAcsChannels5g " + allowedAcsChannels5g);
 //                                    Log.e(TAG, "orig maxChannelBandwidth " + maxChannelBandwidth);
 
-                                    // config set 5G channel
+                                    // config has set 5G channel
                                     if (channel5gIndex >= 0) {
                                         int channel = channels.get(BAND_5GHZ);
 
                                         // 5GHz + allowedAcsChannels5g.size == 0
                                         if (channel == 0 && allowedAcsChannels5g.size() == 0) {
                                             // 5G ACS channels
-                                            param.args[21] = AvailableChannelSet;
+                                            param.args[21] = AvailableChannelSet_HIGH;
                                             // max bandwidth
                                             param.args[23] = CHANNEL_WIDTH_320MHZ;
                                         }
