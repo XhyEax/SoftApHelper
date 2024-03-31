@@ -40,7 +40,7 @@ public class MainHook implements IXposedHookLoadPackage {
 
     private static final String callerMethodName_Q = "configureIPv4";
 
-    private static final String WIFI_HOST_IFACE_ADDR = "192.168.43.1";
+    private static final String WIFI_HOST_IFACE_ADDR = "192.168.1.1";
 
     // TetheringType
     public static final int TETHERING_INVALID = -1;
@@ -97,9 +97,9 @@ public class MainHook implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         ClassLoader classLoader = lpparam.classLoader;
-        Log.e(TAG, "[handleLoadPackage] packageName: "
-                + lpparam.packageName + "-" + lpparam.processName + "-" + classLoader
-        );
+//        Log.e(TAG, "[handleLoadPackage] packageName: "
+//                + lpparam.packageName + "-" + lpparam.processName + "-" + classLoader
+//        );
 
         // 固定热点ip
         final String className = Build.VERSION.SDK_INT <= Build.VERSION_CODES.P ? className_P :
@@ -196,6 +196,28 @@ public class MainHook implements IXposedHookLoadPackage {
                                 }
                             });
                 }
+
+            } catch (Exception exception) {
+//                Log.e(TAG, "exception in " + lpparam.packageName + ": " + exception);
+            }
+        }
+
+        //隐藏热点类型 (Android 10+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            try {
+                Class<?> klass = classLoader.loadClass("android.net.dhcp.DhcpServingParamsParcelExt");
+                Method method = ReflectUtils.findMethod(klass, "setMetered");
+                if (method == null) {
+                    Log.e(TAG, "[Error]: [" + methodName + "] not found in " + klass.getName());
+                }
+                XposedBridge.hookMethod(method,
+                        new XC_MethodHook() {
+                            @Override
+                            protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+                                super.beforeHookedMethod(param);
+                                param.args[0] = false;
+                            }
+                        });
 
             } catch (Exception exception) {
 //                Log.e(TAG, "exception in " + lpparam.packageName + ": " + exception);

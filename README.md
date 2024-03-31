@@ -2,7 +2,14 @@
 
 SoftAp static server IP(v4) for Android 9+
 
+SoftAp type hide for Android 10+
+
 SoftAp 5G channel and bandwidth lock for Android 13+ 
+
+## 功能
+1. 固定IP地址 (Android 9+)
+2. 隐藏热点类型 (Android 10+)
+3. 锁定5G信道和频宽 (Android 13+)
 
 ## 注意
 **网络前缀冲突**会导致网络连接失败（`Android 10`及以下）或仍使用随机IP（`Android 11`及以上，日志提示`isConflictPrefix`）。
@@ -110,6 +117,21 @@ Hook点同安卓12
 
 ```java
 private LinkAddress requestIpv4Address(final boolean useLastAddress)
+```
+
+## 隐藏热点类型
+`android.net.dhcp.DhcpServingParamsParcelExt`的`setMetered`函数。
+
+```java
+    /**
+     * Set whether the DHCP server should send the ANDROID_METERED vendor-specific option.
+     *
+     * <p>If not set, the default value is false.
+     */
+    public DhcpServingParamsParcelExt setMetered(boolean metered) {
+        this.metered = metered;
+        return this;
+    }
 ```
 
 ## 固定5G热点信道
