@@ -40,7 +40,7 @@ public class MainHook implements IXposedHookLoadPackage {
 
     private static final String callerMethodName_Q = "configureIPv4";
 
-    private static final String WIFI_HOST_IFACE_ADDR = "192.168.1.1";
+    private static final String WIFI_HOST_IFACE_ADDR = "192.168.43.1";
 
     // TetheringType
     public static final int TETHERING_INVALID = -1;
@@ -178,22 +178,29 @@ public class MainHook implements IXposedHookLoadPackage {
                                     super.beforeHookedMethod(param);
 
                                     SparseIntArray channels = (SparseIntArray) param.args[4];
+                                    int channel5gIndex = channels.indexOfKey(BAND_5GHZ);
 
-//                                    Set<Integer> allowedAcsChannels5g = (Set<Integer>) param.args[21];
+                                    Set<Integer> allowedAcsChannels5g = (Set<Integer>) param.args[21];
 //                                    int maxChannelBandwidth = (int) param.args[23];
+//                                    Log.e(TAG, "orig channel5gIndex " + channel5gIndex);
 //                                    Log.e(TAG, "orig channels " + channels);
 //                                    Log.e(TAG, "orig allowedAcsChannels5g " + allowedAcsChannels5g);
 //                                    Log.e(TAG, "orig maxChannelBandwidth " + maxChannelBandwidth);
 
                                     // set 5G channel
-                                    int channel = channels.get(BAND_5GHZ);
-                                    if (channel == 0 || !AvailableChannelSet.contains(channel)) {
-                                        // 5G ACS channels
-                                        param.args[21] = AvailableChannelSet;
-                                        // max bandwidth
-                                        param.args[23] = CHANNEL_WIDTH_320MHZ;
+                                    if (channel5gIndex < 0) {
+                                        int channel = channels.get(BAND_5GHZ);
+
+                                        // 5GHz + allowedAcsChannels5g.size == 0
+                                        if (channel == 0 && allowedAcsChannels5g.size() == 0) {
+                                            // 5G ACS channels
+                                            param.args[21] = AvailableChannelSet;
+                                            // max bandwidth
+                                            param.args[23] = CHANNEL_WIDTH_320MHZ;
+                                        }
                                     }
                                 }
+
                             });
                 }
 

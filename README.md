@@ -26,7 +26,7 @@ wifi热点为`192.168.43.1`，同时提供了`192.168.1.1`版本（`43.1`**连�
 | BlueTooth | 192.168.44.1                   |
 | P2P       | 192.168.49.1                   |
 
-安卓13+固定5G热点信道：如果开启5G热点时，未指定5G信道(单个channel或者allowedAcsChannels)，锁定频段为`149,153,157,161,165`，最大频宽为`320MHZ`(受硬件限制，实际可能只有`80MHZ`)。
+安卓13+固定5G热点信道：如果开启5G热点时，未指定5G信道(未指定单个channel或者使用allowedAcsChannels)，模块将锁定频段为`149,153,157,161,165`，最大频宽为`320MHZ`(受硬件限制，实际可能只有`80MHZ`)。
 
 ## 下载
 [Release](https://github.com/XhyEax/SoftApHelper/releases)

@@ -9,8 +9,8 @@ android {
         applicationId "com.xhy.xp.softaphelper"
         minSdk 23
         targetSdk 33
-        versionCode 1090
-        versionName "1.090"
+        versionCode 1091
+        versionName "1.091"
     }
 
     buildTypes {
