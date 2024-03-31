@@ -187,8 +187,8 @@ public class MainHook implements IXposedHookLoadPackage {
 //                                    Log.e(TAG, "orig allowedAcsChannels5g " + allowedAcsChannels5g);
 //                                    Log.e(TAG, "orig maxChannelBandwidth " + maxChannelBandwidth);
 
-                                    // set 5G channel
-                                    if (channel5gIndex < 0) {
+                                    // config set 5G channel
+                                    if (channel5gIndex >= 0) {
                                         int channel = channels.get(BAND_5GHZ);
 
                                         // 5GHz + allowedAcsChannels5g.size == 0
