@@ -154,7 +154,7 @@ public class MainHook implements IXposedHookLoadPackage {
                             }
                         });
             } catch (Exception exception) {
-//                Log.e(TAG, "exception in " + lpparam.packageName);
+                 Log.e(TAG, "exception in " + lpparam.packageName + ": " + exception);
             }
         }
 
@@ -206,7 +206,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 }
 
             } catch (Exception exception) {
-//                Log.e(TAG, "exception in " + lpparam.packageName + ": " + exception);
+                Log.e(TAG, "exception in " + lpparam.packageName + ": " + exception);
             }
         }
 
@@ -228,7 +228,7 @@ public class MainHook implements IXposedHookLoadPackage {
                         });
 
             } catch (Exception exception) {
-//                Log.e(TAG, "exception in " + lpparam.packageName + ": " + exception);
+                Log.e(TAG, "exception in " + lpparam.packageName + ": " + exception);
             }
         }
 
