@@ -141,7 +141,7 @@ public class MainHook implements IXposedHookLoadPackage {
                             protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
                                 super.beforeHookedMethod(param);
 
-                                XposedBridge.log("[" + TAG + "] [Success Hook]: [" + methodName + "] found in " + StackUtils.getStackTraceString());
+//                                XposedBridge.log("[" + TAG + "] [Success Hook]: [" + methodName + "] found in " + StackUtils.getStackTraceString());
 
                                 int mInterfaceType = ReflectUtils.findField(klass, "mInterfaceType").getInt(param.thisObject);
 
