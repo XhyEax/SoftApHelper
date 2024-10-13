@@ -11,14 +11,12 @@ SoftAp 5G channel and bandwidth lock for Android 13+
 2. 隐藏热点类型 (Android 10+)
 3. 锁定5G信道和频宽 (Android 13+)
 
-## 已知问题：部分安卓14系统不适配192.168.43.1，建议使用192.168.1.1版本，原因待排查
-可能故障的系统版本：
+## 安卓14已知问题：
+部分安卓14系统需要手动**重新优化Tethering**，模块才能生效
 
-`三星 One UI 6.1`
+LSPosed-模块-SoftApHelper-长按Tethering-重新优化-重启手机
 
-`摩托罗拉 安卓14`
-
-其他解决方法：降级到安卓13系统版本，或更换其他第三方系统(最新版LineageOS 21、crDroid 测试可用)。
+![](https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/softap-redex.jpg)
 
 ## 注意
 **网络前缀冲突**会导致网络连接失败（`Android 10`及以下）或仍使用随机IP（`Android 11`及以上，日志提示`isConflictPrefix`）。
