@@ -16,7 +16,7 @@ SoftAp 5G channel and bandwidth lock for Android 13+
 
 LSPosed-模块-SoftApHelper-长按Tethering-重新优化-重启手机
 
-![](https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/softap-redex.jpg)
+[图片示例](https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/softap-redex.jpg)
 
 ## 注意
 **网络前缀冲突**会导致网络连接失败（`Android 10`及以下）或仍使用随机IP（`Android 11`及以上，日志提示`isConflictPrefix`）。
