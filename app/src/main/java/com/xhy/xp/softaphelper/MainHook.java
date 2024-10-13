@@ -91,14 +91,14 @@ public class MainHook implements IXposedHookLoadPackage {
                     (boolean) m_isConflictWithUpstream.invoke(mPrivateAddressCoordinator, prefix);
         }
 
-        Log.e(TAG, "[Error]: [isConflictPrefix] method not found.");
+        XposedBridge.log("[" + TAG + "] [Error]: [isConflictPrefix] method not found.");
         return false;
     }
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         ClassLoader classLoader = lpparam.classLoader;
-//        Log.e(TAG, "[handleLoadPackage] packageName: "
+//        XposedBridge.log("["+TAG+"] [handleLoadPackage] packageName: "
 //                + lpparam.packageName + "-" + lpparam.processName + "-" + classLoader
 //        );
 
@@ -108,6 +108,7 @@ public class MainHook implements IXposedHookLoadPackage {
         final String methodName = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? methodName_R :
                 methodName_P_Q;
 
+        // 安卓9-10
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P ||
                 Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
             // 安卓框架
@@ -118,7 +119,9 @@ public class MainHook implements IXposedHookLoadPackage {
                             return WIFI_HOST_IFACE_ADDR;
                         }
                     });
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        }
+        // 安卓11+
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             try {
                 Constructor<?> ctor_LinkAddress = LinkAddress.class.getDeclaredConstructor(String.class);
                 Constructor<?> ctor_IpPrefix = IpPrefix.class.getDeclaredConstructor(String.class);
@@ -126,8 +129,10 @@ public class MainHook implements IXposedHookLoadPackage {
                 Class<?> klass = classLoader.loadClass(className);
                 Method method = ReflectUtils.findMethod(klass, methodName);
                 if (method == null) {
-                    Log.e(TAG, "[Error]: [" + methodName + "] not found in " + klass.getName());
+                    XposedBridge.log("[" + TAG + "] [Error]: [" + methodName + "] not found in class " + klass.getName());
                     return;
+                } else {
+                    XposedBridge.log("[" + TAG + "] [Success]: [" + methodName + "] found in " + lpparam.processName);
                 }
 
                 XposedBridge.hookMethod(method,
@@ -135,6 +140,9 @@ public class MainHook implements IXposedHookLoadPackage {
                             @Override
                             protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
                                 super.beforeHookedMethod(param);
+
+                                XposedBridge.log("[" + TAG + "] [Success Hook]: [" + methodName + "] found in " + StackUtils.getStackTraceString());
+
                                 int mInterfaceType = ReflectUtils.findField(klass, "mInterfaceType").getInt(param.thisObject);
 
                                 String address = AddressMap.get(mInterfaceType);
@@ -146,15 +154,16 @@ public class MainHook implements IXposedHookLoadPackage {
 
                                 if (address != null && StackUtils.isCallingFrom(className, callerMethodName_Q)) {
                                     if (isConflictPrefix(mPrivateAddressCoordinator, prefix)) {
-                                        Log.w(TAG, "[Warning]: [" + WIFI_HOST_IFACE_ADDR + "] isConflictPrefix! do not replace.");
+                                        XposedBridge.log("[" + TAG + "] [Warning]: [" + WIFI_HOST_IFACE_ADDR + "] isConflictPrefix! do not replace.");
                                     } else {
+                                        XposedBridge.log("[" + TAG + "] [Success Edit]:" + address);
                                         param.setResult(mLinkAddress);
                                     }
                                 }
                             }
                         });
             } catch (Exception exception) {
-                 Log.e(TAG, "exception in " + lpparam.packageName + ": " + exception);
+//                XposedBridge.log("[" + TAG + "] exception in " + lpparam.packageName + ": " + exception);
             }
         }
 
@@ -183,10 +192,10 @@ public class MainHook implements IXposedHookLoadPackage {
 
                                     Set<Integer> allowedAcsChannels5g = (Set<Integer>) param.args[21];
 //                                    int maxChannelBandwidth = (int) param.args[23];
-//                                    Log.e(TAG, "orig channel5gIndex " + channel5gIndex);
-//                                    Log.e(TAG, "orig channels " + channels);
-//                                    Log.e(TAG, "orig allowedAcsChannels5g " + allowedAcsChannels5g);
-//                                    Log.e(TAG, "orig maxChannelBandwidth " + maxChannelBandwidth);
+//                                    XposedBridge.log("["+TAG+"] orig channel5gIndex " + channel5gIndex);
+//                                    XposedBridge.log("["+TAG+"] orig channels " + channels);
+//                                    XposedBridge.log("["+TAG+"] orig allowedAcsChannels5g " + allowedAcsChannels5g);
+//                                    XposedBridge.log("["+TAG+"] orig maxChannelBandwidth " + maxChannelBandwidth);
 
                                     // config has set 5G channel
                                     if (channel5gIndex >= 0) {
@@ -206,7 +215,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 }
 
             } catch (Exception exception) {
-                Log.e(TAG, "exception in " + lpparam.packageName + ": " + exception);
+                XposedBridge.log("[" + TAG + "] exception in " + lpparam.packageName + ": " + exception);
             }
         }
 
@@ -216,8 +225,11 @@ public class MainHook implements IXposedHookLoadPackage {
                 Class<?> klass = classLoader.loadClass("android.net.dhcp.DhcpServingParamsParcelExt");
                 Method method = ReflectUtils.findMethod(klass, "setMetered");
                 if (method == null) {
-                    Log.e(TAG, "[Error]: [" + methodName + "] not found in " + klass.getName());
+                    XposedBridge.log("[" + TAG + "] [Error]: [" + methodName + "] not found in class " + klass.getName());
+                }else {
+                    XposedBridge.log("[" + TAG + "] [Success]: [" + methodName + "] found in " + lpparam.processName);
                 }
+
                 XposedBridge.hookMethod(method,
                         new XC_MethodHook() {
                             @Override
@@ -228,7 +240,7 @@ public class MainHook implements IXposedHookLoadPackage {
                         });
 
             } catch (Exception exception) {
-                Log.e(TAG, "exception in " + lpparam.packageName + ": " + exception);
+//                XposedBridge.log("[" + TAG + "] exception in " + lpparam.packageName + ": " + exception);
             }
         }
 
