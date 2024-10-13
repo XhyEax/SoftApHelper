@@ -115,10 +115,11 @@ private LinkAddress requestIpv4Address(final boolean useLastAddress)
 ```
 
 ### 安卓14
-Hook点同安卓12
+Hook点同安卓12（参数有变化，但函数名没变）
 
+[IpServer.java#684](http://aospxref.com/android-14.0.0_r2/xref/packages/modules/Connectivity/Tethering/src/android/net/ip/IpServer.java#684)
 ```java
-private LinkAddress requestIpv4Address(final boolean useLastAddress)
+private LinkAddress requestIpv4Address(final int scope, final boolean useLastAddress)
 ```
 
 ## 隐藏热点类型
