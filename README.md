@@ -12,7 +12,7 @@ SoftAp 5G channel and bandwidth lock for Android 13+
 3. 锁定5G信道和频宽 (Android 13+)
 
 ## 安卓14已知问题：
-部分安卓14系统需要手动**重新优化Tethering**，模块才能生效
+部分安卓14系统由于存在缓存，需要手动**重新优化Tethering**，模块才能生效
 
 LSPosed-模块-SoftApHelper-长按Tethering-重新优化-重启手机
 
@@ -65,10 +65,10 @@ wifi热点为`192.168.43.1`，同时提供了`192.168.1.1`版本（`43.1`**连�
 
 若仍未生效，请上传设备执行`ifconfig`的结果，以及`/apex/com.android.tethering/priv-app/`下的apk到[Issues](https://github.com/XhyEax/SoftApHelper/issues)。
 
-## Todo
-- [ ] 自定义IP
-- [ ] 自定义生效的网络类型
-- [ ] 安卓12及以下自定义5G信道
+## 关于热点IP自定义
+由于涉及配置保存，需要适配不同的安卓系统版本(系统层面限制)以及Xposed版本(API)，时间成本较高，该功能暂不考虑开发。
+
+解决方法：自行使用MT管理器重编译dex，把192.168.43.1替换成目标IP
 
 ## 原理
 [安卓9 固定Wifi热点IP (Xposed)](https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/)
