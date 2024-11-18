@@ -4,6 +4,7 @@ import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
 import android.net.IpPrefix;
 import android.net.LinkAddress;
+import android.net.MacAddress;
 import android.net.wifi.SoftApConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -56,6 +57,9 @@ public class MainHook implements IXposedHookLoadPackage {
     private static final String USB_HOST_IFACE_ADDRESS = "192.168.42.1/24";
     private static final String BT_HOST_IFACE_ADDRESS = "192.168.44.1/24";
     private static final String P2P_HOST_IFACE_ADDRESS = "192.168.49.1/24";
+
+    // staticBSSID Switch
+    private static final boolean shouldStaticBSSID = false;
 
     private static HashMap<Integer, String> AddressMap = new HashMap<>();
 
@@ -186,6 +190,11 @@ public class MainHook implements IXposedHookLoadPackage {
                                 @Override
                                 protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
                                     super.beforeHookedMethod(param);
+
+                                    // staticBSSID
+                                    if(shouldStaticBSSID) {
+                                        param.args[1] = MacAddress.fromString("aa:bb:cc:dd:ee:ff");
+                                    }
 
                                     SparseIntArray channels = (SparseIntArray) param.args[4];
                                     int channel5gIndex = channels.indexOfKey(BAND_5GHZ);
