@@ -57,6 +57,7 @@ public class MainHook implements IXposedHookLoadPackage {
     private static final String USB_HOST_IFACE_ADDRESS = "192.168.42.1/24";
     private static final String BT_HOST_IFACE_ADDRESS = "192.168.44.1/24";
     private static final String P2P_HOST_IFACE_ADDRESS = "192.168.49.1/24";
+    private static final String ETHERNET_HOST_IFACE_ADDRESS = "192.168.45.1/24";
 
     // staticBSSID Switch
     private static final boolean shouldStaticBSSID = false;
@@ -77,9 +78,17 @@ public class MainHook implements IXposedHookLoadPackage {
         AddressMap.put(TETHERING_USB, USB_HOST_IFACE_ADDRESS);
         AddressMap.put(TETHERING_BLUETOOTH, BT_HOST_IFACE_ADDRESS);
         AddressMap.put(TETHERING_WIFI_P2P, P2P_HOST_IFACE_ADDRESS);
+        AddressMap.put(TETHERING_ETHERNET, ETHERNET_HOST_IFACE_ADDRESS);
     }
 
-    private boolean isConflictPrefix(Object mPrivateAddressCoordinator, IpPrefix prefix) throws Exception {
+    private boolean isConflictPrefix(Class<?> klass, Object thiz, IpPrefix prefix) throws Exception {
+        Field field_mPrivateAddressCoordinator = ReflectUtils.findField(klass, "mPrivateAddressCoordinator");
+        // Android 15+, bypass
+        if(field_mPrivateAddressCoordinator == null){
+            XposedBridge.log("[" + TAG + "] [Warning]: [" + WIFI_HOST_IFACE_ADDR + "] field_mPrivateAddressCoordinator not found.");
+            return false;
+        }
+        Object mPrivateAddressCoordinator = field_mPrivateAddressCoordinator.get(thiz);
         Class<?> privateAddressCoordinator = mPrivateAddressCoordinator.getClass();
         // Android 12+
         Method m_getConflictPrefix = ReflectUtils.findMethod(privateAddressCoordinator, "getConflictPrefix");
@@ -147,17 +156,22 @@ public class MainHook implements IXposedHookLoadPackage {
 
 //                                XposedBridge.log("[" + TAG + "] [Success Hook]: [" + methodName + "] found in " + StackUtils.getStackTraceString());
 
-                                int mInterfaceType = ReflectUtils.findField(klass, "mInterfaceType").getInt(param.thisObject);
+                                Field field_mInterfaceType = ReflectUtils.findField(klass, "mInterfaceType");
+                                int mInterfaceType = 0;
+                                if(field_mInterfaceType == null){
+                                    // avoid exception
+                                    XposedBridge.log("[" + TAG + "] [Warning]: [" + WIFI_HOST_IFACE_ADDR + "] field_mInterfaceType not found.");
+                                }else{
+                                    mInterfaceType = field_mInterfaceType.getInt(param.thisObject);
+                                }
 
                                 String address = AddressMap.get(mInterfaceType);
 
                                 final LinkAddress mLinkAddress = (LinkAddress) ctor_LinkAddress.newInstance(address);
                                 final IpPrefix prefix = (IpPrefix) ctor_IpPrefix.newInstance(address);
 
-                                Object mPrivateAddressCoordinator = ReflectUtils.findField(klass, "mPrivateAddressCoordinator").get(param.thisObject);
-
                                 if (address != null && StackUtils.isCallingFrom(className, callerMethodName_Q)) {
-                                    if (isConflictPrefix(mPrivateAddressCoordinator, prefix)) {
+                                    if (isConflictPrefix(klass, param.thisObject, prefix)) {
                                         XposedBridge.log("[" + TAG + "] [Warning]: [" + WIFI_HOST_IFACE_ADDR + "] isConflictPrefix! do not replace.");
                                     } else {
                                         XposedBridge.log("[" + TAG + "] [Success Edit]:" + address);
@@ -234,9 +248,9 @@ public class MainHook implements IXposedHookLoadPackage {
                 Class<?> klass = classLoader.loadClass("android.net.dhcp.DhcpServingParamsParcelExt");
                 Method method = ReflectUtils.findMethod(klass, "setMetered");
                 if (method == null) {
-                    XposedBridge.log("[" + TAG + "] [Error]: [" + methodName + "] not found in class " + klass.getName());
+                    XposedBridge.log("[" + TAG + "] [Error]: [" + "setMetered" + "] not found in class " + klass.getName());
                 }else {
-                    XposedBridge.log("[" + TAG + "] [Success]: [" + methodName + "] found in " + lpparam.processName);
+                    XposedBridge.log("[" + TAG + "] [Success]: [" + "setMetered" + "] found in " + lpparam.processName);
                 }
 
                 XposedBridge.hookMethod(method,
@@ -247,6 +261,29 @@ public class MainHook implements IXposedHookLoadPackage {
                                 param.args[0] = false;
                             }
                         });
+
+
+                Class<?> klassAccessPoint = classLoader.loadClass("android.net.wifi.WifiConfiguration");
+                Method method_isMetered = ReflectUtils.findMethod(klass, "isMetered");
+                if (method_isMetered == null) {
+                    XposedBridge.log("[" + TAG + "] [Error]: [" + "isMetered" + "] not found in class " + klassAccessPoint.getName());
+                }else {
+                    XposedBridge.log("[" + TAG + "] [Success]: [" + "isMetered" + "] found in " + lpparam.processName);
+                }
+
+                XposedBridge.hookMethod(method,
+                        new XC_MethodHook() {
+                            @Override
+                            protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+                                super.beforeHookedMethod(param);
+//                                param.setResult(false);
+                                XposedBridge.log("[" + TAG + "] [Success]: [" + "isMetered" + "] stack:\n" + StackUtils.getStackTraceString());
+
+                            }
+                        });
+
+
+
 
             } catch (Exception exception) {
 //                XposedBridge.log("[" + TAG + "] exception in " + lpparam.packageName + ": " + exception);

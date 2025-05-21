@@ -32,6 +32,7 @@ wifi热点为`192.168.43.1`，同时提供了`192.168.1.1`版本（`43.1`**连�
 | WIFI      | WIFI_HOST_IFACE_ADDR(43.1/1.1) |
 | BlueTooth | 192.168.44.1                   |
 | P2P       | 192.168.49.1                   |
+| ETHERNET  | 192.168.45.1                   |
 
 安卓13+开启5G热点时，如果未指定5G信道(未指定单个channel或者使用allowedAcsChannels)，模块将锁定频段为`149,153,157,161,165`，最大频宽为`320MHZ`(受硬件限制，实际可能只有`80MHZ`)。
 
@@ -143,6 +144,9 @@ private LinkAddress requestIpv4Address(final int scope, final boolean useLastAdd
         return this;
     }
 ```
+
+### 安卓15
+Hook点同安卓14
 
 ## 固定5G热点信道
 ### 方法1：使用本插件
