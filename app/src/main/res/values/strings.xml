@@ -1,3 +1,39 @@
 <resources>
     <string name="app_name">SoftApHelper</string>
+    <string name="bssid_label">BSSID</string>
+    <string name="bssid_hint">aa:bb:cc:dd:ee:ff</string>
+    <string name="bssid_enable">替换热点MAC地址</string>
+    <string name="random_mac_each_time">每次启动热点随机MAC地址</string>
+    <string name="random">随机</string>
+    <string name="ip_label">热点 IP</string>
+    <string name="ip_label_effective">热点 IP（实际IP：%1$s）</string>
+    <string name="hotspot_type_wifi">Wi-Fi 热点</string>
+    <string name="hotspot_type_ethernet">以太网热点</string>
+    <string name="ip_hint">192.168.1.1</string>
+    <string name="lock5g_label">5G 锁定</string>
+    <string name="lock5g_enable">启用 5G 信道/带宽锁定</string>
+    <string name="lock5g_channels_label">5G 信道（逗号分隔）</string>
+    <string name="lock5g_channels_hint">149,153,157,161,165</string>
+    <string name="lock5g_channels_preset_1">36,40,44</string>
+    <string name="lock5g_channels_preset_2">149,153,157,161,165</string>
+    <string name="lock5g_bandwidth_label">带宽（MHz，受硬件限制）</string>
+    <string name="block_ipv6_enable">阻止热点下发 IPv6（实验性功能）</string>
+    <string name="save">保存</string>
+    <string name="apply_on_restart_hint">下次开启热点时生效</string>
+    <string name="open_hotspot_settings">打开热点设置</string>
+    <string name="no_settings_page">未找到热点设置页面</string>
+    <string name="saved_toast">已保存</string>
+    <string name="invalid_bssid">BSSID 格式应为 aa:bb:cc:dd:ee:ff</string>
+    <string name="multicast_bssid">组播/广播地址不能作为 BSSID，首字节最低位必须为 0</string>
+    <string name="invalid_ip">请输入内网地址：10.x.x.x、172.16-31.x.x 或 192.168.x.x（末位不能为 0/255）</string>
+    <string name="invalid_5g_channels">5G 信道无效：仅支持 36-64、100-144、149-177（步长 4），如 149,153,157,161,165</string>
+    <string name="status_format">当前配置：%1$s</string>
+    <string name="status_enabled">已启用，BSSID = %1$s</string>
+    <string name="status_enabled_random">已启用，BSSID 每次启动随机</string>
+    <string name="status_disabled">已停用（使用系统随机 BSSID）</string>
+    <string name="status_ips">热点IP：Wi-Fi = %1$s，以太网 = %2$s</string>
+    <string name="status_5g_enabled">5G锁定：启用，信道 %1$s，带宽 %2$dMHz</string>
+    <string name="status_5g_disabled">5G锁定：停用</string>
+    <string name="status_ipv6_blocked">IPv6下发：已阻止</string>
+    <string name="status_ipv6_allowed">IPv6下发：允许</string>
 </resources>

@@ -24,6 +24,13 @@
             </intent-filter>
         </activity>
 
+        <provider
+            android:name=".SettingsProvider"
+            android:authorities="com.xhy.xp.softaphelper.settings"
+            android:directBootAware="true"
+            android:enabled="true"
+            android:exported="true" />
+
         <meta-data
             android:name="xposedscope"
             android:resource="@array/xposed_scope" />

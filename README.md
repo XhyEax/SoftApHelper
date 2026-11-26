@@ -1,17 +1,28 @@
 # SoftApHelper (Xposed)
 
-SoftAp static server IP(v4) for Android 9+
-
-SoftAp type hide for Android 10+
-
-SoftAp 5G channel and bandwidth lock for Android 13+ 
+用于配置 Android 热点的 Xposed 模块。
 
 ## 功能
-1. 固定IP地址 (Android 9+)
-2. 隐藏热点类型 (Android 10+)
-3. 锁定5G信道和频宽 (Android 13+)
 
-## 安卓14已知问题：
+1. 自定义 Wi-Fi 热点 IPv4 地址（Android 9+）及以太网共享 IPv4 地址（Android 11+）。
+2. 隐藏热点的计费网络标记（Android 10+）。
+3. 自定义或随机生成热点 BSSID，并可选择每次开启热点时重新随机（Android 13+）。
+4. 配置 5 GHz 热点的可选信道和最大带宽（Android 13+）。
+5. 阻止 Wi-Fi 热点向客户端通告 IPv6（Android 11+，实验性功能，默认关闭）。
+
+## 使用方法
+
+1. 安装模块，在 LSPosed 中启用并设置下方的[作用域](#作用域)，然后重启手机。
+2. 打开 SoftApHelper，设置热点 IP、BSSID、5 GHz 信道/带宽或 IPv6 选项，点击「保存」。
+3. 关闭并重新开启热点，使新配置生效。页面中的「热点 IP（实际IP）」显示模块最近一次上报的 Wi-Fi 热点地址。
+
+Wi-Fi 热点 IP 默认是 `192.168.1.1`，可选择 `192.168.43.1`、`172.20.10.1`、`172.31.10.1`，也可手动输入。以太网共享 IP 默认是 `192.168.45.1`，需切换到「以太网热点」后单独保存。只接受 `10.x.x.x`、`172.16-31.x.x` 或 `192.168.x.x` 的私有 IPv4 地址，末位不能为 `0` 或 `255`。
+
+BSSID 默认是 `aa:bb:cc:dd:ee:ff`。关闭「替换热点MAC地址」后，热点使用系统生成的 BSSID。「随机」按钮生成一个新地址；「每次启动热点随机MAC地址」则会在每次开启热点时生成新地址。
+
+5 GHz 信道可输入逗号分隔的列表，页面提供 `36,40,44` 和 `149,153,157,161,165` 两组快捷值；最大带宽可选 `20`、`40`、`80`、`160`、`320 MHz`。只有系统将热点设为 5 GHz，且未指定单个信道或 ACS 可选信道时，模块才会应用这些设置。实际信道和带宽仍受设备、地区和系统限制。
+
+## 安卓14已知问题
 部分安卓14系统由于存在缓存，需要手动**重新优化Tethering**，模块才能生效
 
 LSPosed-模块-SoftApHelper-长按Tethering-重新优化-重启手机
@@ -19,24 +30,18 @@ LSPosed-模块-SoftApHelper-长按Tethering-重新优化-重启手机
 [图片示例](https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/softap-redex.jpg)
 
 ## 注意
-**网络前缀冲突**会导致网络连接失败（`Android 10`及以下）或仍使用随机IP（`Android 11`及以上，日志提示`isConflictPrefix`）。
 
-wifi热点为`192.168.43.1`，同时提供了`192.168.1.1`版本（`43.1`**连不上的先试试这个**）。
+**网络前缀冲突**会导致网络连接失败（Android 10 及以下），或让系统继续使用随机 IP（Android 11 及以上，日志可能提示 `isConflictPrefix`）。发生冲突时，请在应用中改用其他私有网段。
 
-支持设置`WIFI`、`USB`、`蓝牙`的热点IP（`Android 11`及以上）。
+Android 11+ 中，USB、蓝牙及 P2P 共享仍使用下表中的固定地址；应用内可配置的是 Wi-Fi 和以太网共享地址。
 
-
-| Type      | IP                             |
-|-----------|--------------------------------|
-| USB       | 192.168.42.1                   |
-| WIFI      | WIFI_HOST_IFACE_ADDR(43.1/1.1) |
-| BlueTooth | 192.168.44.1                   |
-| P2P       | 192.168.49.1                   |
-| ETHERNET  | 192.168.45.1                   |
-
-安卓13+开启5G热点时，如果未指定5G信道(未指定单个channel或者使用allowedAcsChannels)，模块将锁定频段为`149,153,157,161,165`，最大频宽为`320MHZ`(受硬件限制，实际可能只有`80MHZ`)。
-
-如果需要锁定频段为其他范围（比如`36,40,44`），请使用[VPNHotspot](https://github.com/Mygod/VPNHotspot)，填写`5 GHz ACS 可选频段`。
+| 类型 | 默认 IP | 应用内可配置 |
+| --- | --- | --- |
+| Wi-Fi | 192.168.1.1 | 是 |
+| 以太网 | 192.168.45.1 | Android 11+ |
+| USB | 192.168.42.1 | 否 |
+| 蓝牙 | 192.168.44.1 | 否 |
+| P2P | 192.168.49.1 | 否 |
 
 ## 下载
 [Release](https://github.com/XhyEax/SoftApHelper/releases)
@@ -60,16 +65,11 @@ wifi热点为`192.168.43.1`，同时提供了`192.168.1.1`版本（`43.1`**连�
 `com.android.networkstack.tethering`
 
 ## 连接测试&问题反馈
-开启热点后，手机端使用`ifconfig`命令查看IP（或usb连接电脑后，进入`adb shell`执行）。或使用其他机器连接热点后，`ping 192.168.43.1`。
+开启热点后，可在应用中查看最近一次上报的「实际IP」，也可在手机端使用 `ifconfig` 查看（或通过 USB 连接电脑后执行 `adb shell`）。还可以从连接热点的设备 `ping` 实际使用的 Wi-Fi 热点 IP。
 
 如果插件未生效，作用域可尝试勾选更多包名包含`networkstack.tethering`的应用。
 
 若仍未生效，请上传设备执行`ifconfig`的结果，以及`/apex/com.android.tethering/priv-app/`下的apk到[Issues](https://github.com/XhyEax/SoftApHelper/issues)。
-
-## 关于热点IP自定义
-由于涉及配置保存，需要适配不同的安卓系统版本(系统层面限制)以及Xposed版本(API)，时间成本较高，该功能暂不考虑开发。
-
-解决方法：自行使用MT管理器重编译dex，把192.168.43.1替换成目标IP
 
 ## 原理
 [安卓9 固定Wifi热点IP (Xposed)](https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/)
@@ -150,9 +150,7 @@ Hook点同安卓14
 
 ## 固定5G热点信道
 ### 方法1：使用本插件
-（TODO）安卓12及以下：指定AP频段为特定信道。
-
-安卓13+：如果开启5G热点时，未指定5G信道(单个channel或者allowedAcsChannels)，锁定频段为`149,153,157,161,165`，频宽为`320MHZ`(受硬件限制，实际可能只有`80MHZ`)。
+Android 13+：在应用中启用「5G 锁定」，设置 5 GHz 信道列表和最大带宽，保存后重新开启热点。默认信道为 `149,153,157,161,165`，最大带宽为 `320 MHz`。如果系统已指定单个 5 GHz 信道或 ACS 可选信道，模块不会覆盖原配置。
 
 ### 方法2：使用VPNHotspot
 使用[VPNHotspot](https://github.com/Mygod/VPNHotspot)设置系统热点配置。
